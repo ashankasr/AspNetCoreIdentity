@@ -1,7 +1,9 @@
 # AspNetCoreIdentity
 
 http://www.blinkingcaret.com/2016/11/30/asp-net-identity-core-from-scratch/
+
 https://wildermuth.com/2017/07/06/Program-cs-in-ASP-NET-Core-2-0
+
 https://codingblast.com/entityframework-core-idesigntimedbcontextfactory/
 
 1) Install Node.js
