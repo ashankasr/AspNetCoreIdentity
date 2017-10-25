@@ -128,4 +128,106 @@ Steps
             }
 22. Modify Main Method and add using statement for `Microsoft.Extensions.Configuration;`
 
+
 23. Add appsettings.json file into the web project folder
+		
+        {
+			"ConnectionStrings": {
+				"AuthDbConnection": "Data Source=.;Initial Catalog=AuthDb;Integrated Security=True"
+            }
+        }
+24. Add new folder called CustomIdentity. Maintain your custom DbContext of the identity database. Add below implementations as two classes in the that folder
+	* ApplicationDbContext
+    
+            using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+            using Microsoft.EntityFrameworkCore;
+
+            namespace ASRIdentity.Web.CustomIdentity
+            {
+                public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+                {
+                    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+                        : base(options)
+                    {
+                    }
+
+                    protected override void OnModelCreating(ModelBuilder builder)
+                    {
+                        base.OnModelCreating(builder);
+                        // Customize the ASP.NET Identity model and override the defaults if needed.
+                        // For example, you can rename the ASP.NET Identity table names and more.
+                        // Add your customizations after calling base.OnModelCreating(builder);
+                    }
+                }
+            }
+    
+	* ApplicationUser
+	
+            using Microsoft.AspNetCore.Identity;
+
+            namespace ASRIdentity.Web.CustomIdentity
+            {
+                // Add profile data for application users by adding properties to the ApplicationUser class
+                public class ApplicationUser : IdentityUser
+                {
+                }
+            }
+    
+25. In order to add mirgrations you need to implement `IDesignTimeDbContextFactory`
+
+          using Microsoft.EntityFrameworkCore;
+          using Microsoft.EntityFrameworkCore.Design;
+          using Microsoft.Extensions.Configuration;
+          using System.IO;
+
+          namespace ASRIdentity.Web.CustomIdentity
+          {
+              public class ApplicationDesignTimeDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+              {
+                  public ApplicationDbContext CreateDbContext(string[] args)
+                  {
+                      IConfigurationRoot configuration = new ConfigurationBuilder()
+                      .SetBasePath(Directory.GetCurrentDirectory())
+                      .AddJsonFile("appsettings.json")
+                      .Build();
+
+                      var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
+
+                      var connectionString = configuration.GetConnectionString("AuthDbConnection");
+
+                      builder.UseSqlServer(connectionString);
+
+                      return new ApplicationDbContext(builder.Options);
+                  }
+              }
+          }
+
+26. Add below code peice in the `Startup.cs`
+
+          services.AddDbContext<ApplicationDbContext>(options => 
+                      options.UseSqlServer(Configuration.GetConnectionString("AuthDbConnection")));
+
+          services.AddIdentity<ApplicationUser, IdentityRole>()
+              .AddEntityFrameworkStores<ApplicationDbContext>()
+              .AddDefaultTokenProviders();
+
+27. Add below code peice in the `Startup.cs`
+
+		app.UseAuthentication();
+
+28. Add the following NugetPackage. Due VS issue do not import the NuGet Packages using package manager tool. Unload the project add the below items to project file.
+
+        <ItemGroup>
+          <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
+          <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
+        </ItemGroup>
+29. Build the solution
+
+
+30. In the CMD cd into the project root and add migrations and update the database
+	
+          dotnet ef migrations add Initial
+          dotnet ef database update
+    
+
+    
