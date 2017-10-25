@@ -128,6 +128,27 @@ Steps
             }
 22. Modify Main Method and add using statement for `Microsoft.Extensions.Configuration;`
 
+	    public class Program
+	    {
+		    public static void Main(string[] args)
+		    {
+		        var host = new WebHostBuilder()
+			    .UseKestrel()
+			    .UseContentRoot(Directory.GetCurrentDirectory())
+			    .UseIISIntegration()
+			    .UseStartup<Startup>()
+			    .ConfigureAppConfiguration((hostContext, config) =>
+			    {
+			        // delete all default configuration providers
+			        config.Sources.Clear();
+			        config.AddJsonFile("appsettings.json", optional: true);
+			    })
+			    .Build();
+    
+		        host.Run();
+		    }
+	    }
+
 
 23. Add `appsettings.json` file into the web project folder
 		
