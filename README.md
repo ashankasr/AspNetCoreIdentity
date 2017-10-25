@@ -1,7 +1,7 @@
 ASP.NET Core Identity - Configure from Scratch!
 ===================
 
-Hi All, I wanted to configure Identity in an empty ASP.NET Core web application. After going through below blogs I was able to successfully configure ASP.NET Core Identity. 
+Hi All, I wanted to configure Identity in an empty **ASP.NET Core web application**. After going through below blogs I was able to successfully configure **ASP.NET Core Identity**. 
 
 Reference Links
 
@@ -65,7 +65,7 @@ Steps
  11. Adding first controller. Create Controllers folder in the root of the web project
  
  
- 12. Add HomeController
+ 12. Add `HomeController.cs`
 
 
  13. Add Views folder in the root of the web project
@@ -74,16 +74,16 @@ Steps
  14. In side the Views Folder create the Shared folder
 
 
- 15. Add the _Layout.cshtml
+ 15. Add the `_Layout.cshtml`
 
 
- 16. In the Views folder create the _ViewStart.cshtml file
+ 16. In the Views folder create the `_ViewStart.cshtml` file
 
 
  17. Add Home folder in the Views folder
 
 
- 18. Add Index.cshtml file in the Home folder
+ 18. Add `Index.cshtml` file in the Home folder
 
 
  19. Copy the below code into the index file
@@ -129,7 +129,7 @@ Steps
 22. Modify Main Method and add using statement for `Microsoft.Extensions.Configuration;`
 
 
-23. Add appsettings.json file into the web project folder
+23. Add `appsettings.json` file into the web project folder
 		
         {
 			"ConnectionStrings": {
