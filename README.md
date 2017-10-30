@@ -251,4 +251,158 @@ Steps
           dotnet ef database update
     
 
-    
+31. Update AccountController
+			
+		  public class AccountController : Controller
+		  {
+		 	  private readonly UserManager<ApplicationUser> _userManager;
+		 	  private readonly SignInManager<ApplicationUser> _signInManager;
+              
+		 	  public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+		 	  {
+		 	  	  this._userManager = userManager;
+		 	  	  this._signInManager = signInManager;
+		 	  }
+32. Add Registry GET and POST methods
+
+          public IActionResult Register()
+          {
+              return View();
+          }
+
+          [HttpPost]
+          public async Task<IActionResult> Register(string email, string password, string repassword)
+          {
+              if (password != repassword)
+              {
+                  ModelState.AddModelError(string.Empty, "Password don't match");
+                  return View();
+              }
+
+              var newUser = new ApplicationUser
+              {
+                  UserName = email,
+                  Email = email
+              };
+
+              var userCreationResult = await _userManager.CreateAsync(newUser, password);
+              if (!userCreationResult.Succeeded)
+              {
+                  foreach (var error in userCreationResult.Errors)
+                  {
+                      ModelState.AddModelError(string.Empty, error.Description);
+                  }
+
+                  return View();
+              }
+
+              var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
+              var tokenVerificationUrl = Url.Action("VerifyEmail", "Account", new { id = newUser.Id, token = emailConfirmationToken }, Request.Scheme);
+
+              ////await _messageService.Send(email, "Verify your email", $"Click <a href=\"{tokenVerificationUrl}\">here</a> to verify your email");
+
+              return this.Redirect("/");
+          }
+		
+33. And now the razor file in `Views/Account/Register.cshtml`
+      ```
+        @{
+            ViewData["Title"] = "Register";
+            Layout = "~/Views/Shared/_Layout.cshtml";
+        }
+
+        <h2>Register</h2>
+
+        <form method="POST">
+            <div>
+                <label>Email</label>
+                <input type="email" name="email" />
+            </div>
+
+            <div>
+                <label>Password</label>
+                <input type="password" name="password" />
+            </div>
+
+            <div>
+                <label>Retype password</label>
+                <input type="password" name="repassword" />
+            </div>
+
+            <input type="submit" />
+        </form>
+
+        <div asp-validation-summary="All"></div>
+      ```
+34. Run the application and try to add a user
+
+
+35. Check the added user in the database `SELECT * FROM [AuthDb].[dbo].[AspNetUsers]`
+
+
+36. Add Login functionality in AccountController
+
+```
+		public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(string email, string password, bool rememberMe)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login");
+                return View();
+            }
+            if (!user.EmailConfirmed)
+            {
+                ModelState.AddModelError(string.Empty, "Confirm your email first");
+                return View();
+            }
+
+            var passwordSignInResult = await _signInManager.PasswordSignInAsync(user, password, isPersistent: rememberMe, lockoutOnFailure: false);
+            if (!passwordSignInResult.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login");
+                return View();
+            }
+
+            return Redirect("~/");
+        }
+```
+
+37. Add login razor view
+```
+
+	@{
+	    ViewData["Title"] = "Login";
+	    Layout = "~/Views/Shared/_Layout.cshtml";
+	}
+
+	<h2>Login</h2>
+	
+	<form method="POST">
+	    <div>
+	        <label>Email</label>
+	        <input type="email" name="email" />
+	    </div>
+	
+	    <div>
+	        <label>Password</label>
+	        <input type="password" name="password" />
+	    </div>
+	
+	    <input type="submit" />
+	</form>
+
+	<div asp-validation-summary="All"></div>
+```
+
+
+
+Posted by Ashanka Randeniya
+
+Twitter: @AshankaSR
