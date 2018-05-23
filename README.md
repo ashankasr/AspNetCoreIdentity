@@ -23,7 +23,7 @@ Steps
  
  3. Install **bower**, **yeamon** and **yeamon generator** for **asp.net**
 	```
-		install -g yo bower
+		npm install -g yo bower
 		npm install -g generator-aspnet
 	```	 
  4. Create a project using yeamon generator and select **Create an empty web application**
